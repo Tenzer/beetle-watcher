@@ -7,11 +7,11 @@ from watchdog.observers import Observer
 class Watcher(object):
     last_render = 0
 
-    def __init__(self, config, beetle_config, commander):
+    def __init__(self, config, beetle_config, builder):
         self.config = config
         self.folders = beetle_config.folders
         self.port = config.get('port', 5000)
-        self.commander = commander
+        self.builder = builder
 
     def _start_observer(self):
         self.observer = Observer()
@@ -42,7 +42,7 @@ class Watcher(object):
         stdout.flush()
 
         try:
-            self.commander.run('render')
+            self.builder.run()
             print('Done')
         except Exception as error:
             print('\nError occured during rendering: {}'.format(error))
@@ -51,5 +51,5 @@ class Watcher(object):
 
 
 def register(plugin_config, config, commander, builder, content_renderer):
-    watcher = Watcher(plugin_config, config, commander)
+    watcher = Watcher(plugin_config, config, builder)
     commander.add('watcher', watcher.watch, 'Watch input files and do a render on changes')
